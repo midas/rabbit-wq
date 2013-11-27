@@ -1,15 +1,15 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'brer_rabbit/version'
+require 'rabbit_wq/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "brer_rabbit"
-  spec.version       = BrerRabbit::VERSION
+  spec.name          = "rabbit-wq"
+  spec.version       = RabbitWq::VERSION
   spec.authors       = ["C. Jason Harrelson"]
   spec.email         = ["jason@lookforwardenterprises.com"]
-  spec.description   = %q{A work queue built on RabbitMQ.  See README for more details.}
-  spec.summary       = %q{A work queue built on RabbitMQ.}
+  spec.description   = %q{A work queue built on RabbitMQ and Celluloid.  See README for more details.}
+  spec.summary       = %q{A work queue built on RabbitMQ and Celluloid.}
   spec.homepage      = ""
   spec.license       = "MIT"
 

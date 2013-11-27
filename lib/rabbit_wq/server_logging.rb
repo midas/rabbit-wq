@@ -2,20 +2,20 @@ require 'yell'
 
 # Provides logging services for the base server.
 #
-module BrerRabbit
+module RabbitWq
   module ServerLogging
 
   protected
 
     def initialize_loggers
       if options[:interactive] || options[:log].nil? || options[:log].empty?
-        BrerRabbit.logger = Yell.new do |l|
+        RabbitWq.logger = Yell.new do |l|
           l.level = log_level
           l.adapter $stdout, :level => [:debug, :info, :warn]
           l.adapter $stderr, :level => [:error, :fatal]
         end
       else
-        BrerRabbit.logger = Yell.new do |l|
+        RabbitWq.logger = Yell.new do |l|
           l.level = log_level
           l.adapter :file, options[:log]
         end
@@ -29,7 +29,7 @@ module BrerRabbit
 
     def log_startup
       start_banner( options ).each do |line|
-        BrerRabbit.logger.info line
+        RabbitWq.logger.info line
       end
     end
 
@@ -37,7 +37,7 @@ module BrerRabbit
       [
         "",
         "***",
-        "* #{BrerRabbit::APP_NAME} started",
+        "* #{RabbitWq::APP_NAME} started",
         "*",
         "* #{VERSION_COPYRIGHT}",
         "***",

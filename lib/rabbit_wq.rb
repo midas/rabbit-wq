@@ -1,8 +1,8 @@
-require "brer_rabbit/version"
+require "rabbit_wq/version"
 
-module BrerRabbit
+module RabbitWq
 
-  APP_ID                = "brer-rabbit"
+  APP_ID                = "rabbit-wq"
   APP_NAME              = "Rabbit Work Queue"
   COMPANY               = "Look Forward Enterprises"
   DELAY_QUEUE_PREFIX    = "work-delay" # TODO: Make this configurable (from ENV, or file?)
@@ -12,12 +12,12 @@ module BrerRabbit
   VERSION_COPYRIGHT     = "v#{VERSION} \u00A9#{Time.now.year} #{COMPANY}"
   WORK_EXCHANGE         = "work" # TODO: Make this configurable (from ENV, or file?)
 
-  autoload :Configuration,  'brer_rabbit/configuration'
-  autoload :Logging,        'brer_rabbit/logging'
-  autoload :MessageHandler, 'brer_rabbit/message_handler'
-  autoload :Server,         'brer_rabbit/server'
-  autoload :ServerLogging,  'brer_rabbit/server_logging'
-  autoload :Work,           'brer_rabbit/work'
+  autoload :Configuration,  'rabbit_wq/configuration'
+  autoload :Logging,        'rabbit_wq/logging'
+  autoload :MessageHandler, 'rabbit_wq/message_handler'
+  autoload :Server,         'rabbit_wq/server'
+  autoload :ServerLogging,  'rabbit_wq/server_logging'
+  autoload :Work,           'rabbit_wq/work'
 
   def self.configuration
     @configuration ||= Configuration.new

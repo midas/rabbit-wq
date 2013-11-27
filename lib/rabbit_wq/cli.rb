@@ -1,9 +1,9 @@
 require 'rubygems'
-require 'brer_rabbit'
+require 'rabbit_wq'
 require 'trollop'
 require 'yell'
 
-module BrerRabbit
+module RabbitWq
   module Cli
 
     SUB_COMMANDS = %w(
@@ -22,37 +22,37 @@ module BrerRabbit
     end
 
     def self.start_interactive( options )
-      server = BrerRabbit::Server.new( options.merge( log: nil ) )
+      server = RabbitWq::Server.new( options.merge( log: nil ) )
       server.start
     end
 
     def self.start_daemon( options )
-      server = BrerRabbit::ServerDaemon.new( options )
+      server = RabbitWq::ServerDaemon.new( options )
       server.start
     end
 
   end
 end
 
-DEFAULT_LOG_PATH = "/var/log/rabbit/#{BrerRabbit::APP_ID}.log"
-DEFAULT_PID_PATH = "/var/run/rabbit/#{BrerRabbit::APP_ID}.pid"
+DEFAULT_LOG_PATH = "/var/log/rabbit-wq/#{RabbitWq::APP_ID}.log"
+DEFAULT_PID_PATH = "/var/run/rabbit-wq/#{RabbitWq::APP_ID}.pid"
 
 global_opts = Trollop::options do
-  version BrerRabbit::VERSION_COPYRIGHT
+  version RabbitWq::VERSION_COPYRIGHT
   banner <<-EOS
-#{BrerRabbit::APP_NAME} #{BrerRabbit::VERSION_COPYRIGHT}
+#{RabbitWq::APP_NAME} #{RabbitWq::VERSION_COPYRIGHT}
 
 Usage:
-  #{BrerRabbit::APP_ID} [command] [options]
+  #{RabbitWq::APP_ID} [command] [options]
 
   commands:
-#{BrerRabbit::Cli::SUB_COMMANDS.map { |cmd| "    #{cmd}" }.join( "\n" )}
+#{RabbitWq::Cli::SUB_COMMANDS.map { |cmd| "    #{cmd}" }.join( "\n" )}
 
-  (For help with a command: #{BrerRabbit::APP_ID} [command] -h)
+  (For help with a command: #{RabbitWq::APP_ID} [command] -h)
 
 options:
 EOS
-  stop_on BrerRabbit::Cli::SUB_COMMANDS
+  stop_on RabbitWq::Cli::SUB_COMMANDS
 end
 
 # Get the sub-command and its options
@@ -97,11 +97,11 @@ end
 #
 case cmd
   when "restart"
-    BrerRabbit::ServerDaemon.new( cmd_opts ).restart
+    RabbitWq::ServerDaemon.new( cmd_opts ).restart
   when "start"
-    BrerRabbit::Cli.start cmd_opts
+    RabbitWq::Cli.start cmd_opts
   when "status"
-    BrerRabbit::ServerDaemon.new( cmd_opts ).status
+    RabbitWq::ServerDaemon.new( cmd_opts ).status
   when "stop"
-    BrerRabbit::ServerDaemon.new( cmd_opts ).stop
+    RabbitWq::ServerDaemon.new( cmd_opts ).stop
   end

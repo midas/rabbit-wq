@@ -1,2 +1,2 @@
 #!/usr/bin/env ruby
-require 'brer_rabbit/cli'
+require 'rabbit_wq/cli'

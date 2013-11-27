@@ -1,12 +1,13 @@
-# BrerRabbit
+# RabbitWq
 
-TODO: Write a gem description
+A work queue built on RabbitMQ and Celluloid.
+
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'brer_rabbit'
+    gem 'rabbit-wq'
 
 And then execute:
 
@@ -14,16 +15,12 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install brer_rabbit
+    $ gem install rabbit-wq
+
 
 ## Usage
 
 TODO: Write usage instructions here
 
-## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+## Contributing

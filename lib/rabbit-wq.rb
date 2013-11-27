@@ -1,0 +1,1 @@
+require "rabbit_wq"

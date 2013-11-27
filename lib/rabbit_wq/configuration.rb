@@ -1,4 +1,4 @@
-module BrerRabbit
+module RabbitWq
   class Configuration
 
     #def authentication_token
