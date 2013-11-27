@@ -5,7 +5,7 @@ require 'rabbit_wq/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "rabbit-wq"
-  spec.version       = RabbitWq::VERSION
+  spec.version       = RabbitWQ::VERSION
   spec.authors       = ["C. Jason Harrelson"]
   spec.email         = ["jason@lookforwardenterprises.com"]
   spec.description   = %q{A work queue built on RabbitMQ and Celluloid.  See README for more details.}

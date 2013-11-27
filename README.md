@@ -1,4 +1,4 @@
-# RabbitWq
+# RabbitWQ
 
 A work queue built on RabbitMQ and Celluloid.
 

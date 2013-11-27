@@ -1,6 +1,6 @@
 require 'bunny'
 
-module RabbitWq
+module RabbitWQ
   class Server
 
     include ServerLogging

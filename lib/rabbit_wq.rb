@@ -1,6 +1,6 @@
 require "rabbit_wq/version"
 
-module RabbitWq
+module RabbitWQ
 
   APP_ID                = "rabbit-wq"
   APP_NAME              = "Rabbit Work Queue"

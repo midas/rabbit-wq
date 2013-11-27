@@ -1,4 +1,4 @@
-module RabbitWq
+module RabbitWQ
   module Logging
 
     %w(
@@ -11,7 +11,7 @@ module RabbitWq
 
       define_method level do |*messages|
         messages.each do |message|
-          RabbitWq.logger.send level, message
+          RabbitWQ.logger.send level, message
         end
       end
 

@@ -1,3 +1,3 @@
-module RabbitWq
+module RabbitWQ
   VERSION = "0.0.1"
 end

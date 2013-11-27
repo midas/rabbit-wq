@@ -1,4 +1,4 @@
-module RabbitWq
+module RabbitWQ
   class Configuration
 
     #def authentication_token

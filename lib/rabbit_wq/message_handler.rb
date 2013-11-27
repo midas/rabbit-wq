@@ -1,6 +1,6 @@
 require 'celluloid/autostart'
 
-module RabbitWq
+module RabbitWQ
   class MessageHandler
 
     include Celluloid

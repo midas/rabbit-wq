@@ -1,6 +1,6 @@
 require 'bunny'
 
-module RabbitWq
+module RabbitWQ
   module Work
 
     def self.enqueue( worker, options={} )

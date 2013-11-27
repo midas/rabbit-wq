@@ -3,7 +3,7 @@ require 'rabbit_wq'
 require 'trollop'
 require 'yell'
 
-module RabbitWq
+module RabbitWQ
   module Cli
 
     SUB_COMMANDS = %w(
@@ -22,37 +22,37 @@ module RabbitWq
     end
 
     def self.start_interactive( options )
-      server = RabbitWq::Server.new( options.merge( log: nil ) )
+      server = RabbitWQ::Server.new( options.merge( log: nil ) )
       server.start
     end
 
     def self.start_daemon( options )
-      server = RabbitWq::ServerDaemon.new( options )
+      server = RabbitWQ::ServerDaemon.new( options )
       server.start
     end
 
   end
 end
 
-DEFAULT_LOG_PATH = "/var/log/rabbit-wq/#{RabbitWq::APP_ID}.log"
-DEFAULT_PID_PATH = "/var/run/rabbit-wq/#{RabbitWq::APP_ID}.pid"
+DEFAULT_LOG_PATH = "/var/log/rabbit-wq/#{RabbitWQ::APP_ID}.log"
+DEFAULT_PID_PATH = "/var/run/rabbit-wq/#{RabbitWQ::APP_ID}.pid"
 
 global_opts = Trollop::options do
-  version RabbitWq::VERSION_COPYRIGHT
+  version RabbitWQ::VERSION_COPYRIGHT
   banner <<-EOS
-#{RabbitWq::APP_NAME} #{RabbitWq::VERSION_COPYRIGHT}
+#{RabbitWQ::APP_NAME} #{RabbitWQ::VERSION_COPYRIGHT}
 
 Usage:
-  #{RabbitWq::APP_ID} [command] [options]
+  #{RabbitWQ::APP_ID} [command] [options]
 
   commands:
-#{RabbitWq::Cli::SUB_COMMANDS.map { |cmd| "    #{cmd}" }.join( "\n" )}
+#{RabbitWQ::Cli::SUB_COMMANDS.map { |cmd| "    #{cmd}" }.join( "\n" )}
 
-  (For help with a command: #{RabbitWq::APP_ID} [command] -h)
+  (For help with a command: #{RabbitWQ::APP_ID} [command] -h)
 
 options:
 EOS
-  stop_on RabbitWq::Cli::SUB_COMMANDS
+  stop_on RabbitWQ::Cli::SUB_COMMANDS
 end
 
 # Get the sub-command and its options
@@ -97,11 +97,11 @@ end
 #
 case cmd
   when "restart"
-    RabbitWq::ServerDaemon.new( cmd_opts ).restart
+    RabbitWQ::ServerDaemon.new( cmd_opts ).restart
   when "start"
-    RabbitWq::Cli.start cmd_opts
+    RabbitWQ::Cli.start cmd_opts
   when "status"
-    RabbitWq::ServerDaemon.new( cmd_opts ).status
+    RabbitWQ::ServerDaemon.new( cmd_opts ).status
   when "stop"
-    RabbitWq::ServerDaemon.new( cmd_opts ).stop
+    RabbitWQ::ServerDaemon.new( cmd_opts ).stop
   end
