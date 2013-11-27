@@ -2,6 +2,8 @@
 
 A work queue built on RabbitMQ and Celluloid.
 
+This is NOT production ready.  Released only to reserve gem name.
+
 
 ## Installation
 
