@@ -1,3 +1,5 @@
+require 'yell'
+
 module RabbitWQ
   module Logging
 

@@ -3,11 +3,12 @@ require 'bunny'
 module RabbitWQ
   class Server
 
-    include ServerLogging
     include Logging
+    include Queues
+    include ServerLogging
 
-    attr_reader :message_consumer,
-                :options,
+    attr_reader :options,
+                :work_consumer,
                 :work_exchange
 
     def initialize( options )
@@ -29,28 +30,18 @@ module RabbitWQ
 
     def finalize
       info "SHUTTING DOWN"
-      message_consumer.cancel
+      work_consumer.cancel
       mq.close
-    end
-
-    def mq
-      @mq ||= ::Bunny.new.tap do |bunny|
-        bunny.start
-      end
-    end
-
-    def channel
-      @channel ||= mq.create_channel
     end
 
     def work_exchange
       @work_exchange ||= channel.direct( WORK_EXCHANGE, durable: true )
     end
 
-    def queue
-      @queue ||= channel.queue( QUEUE,
-                                durable: true ).
-                         bind( work_exchange )
+    def work_queue
+      @work_queue ||= channel.queue( QUEUE,
+                                     durable: true ).
+                              bind( work_exchange )
     end
 
     def pool
@@ -58,8 +49,8 @@ module RabbitWQ
     end
 
     def run
-      @message_consumer = queue.subscribe( manual_ack: true ) do |delivery_info, metadata, payload|
-        debug "LISTENER RECEIVED #{payload}"
+      @work_consumer = work_queue.subscribe( manual_ack: true ) do |delivery_info, metadata, payload|
+        info "LISTENER RECEIVED #{payload}"
 
         pool.async.call( payload: payload,
                          delivery_info: delivery_info,
