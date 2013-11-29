@@ -63,6 +63,7 @@ module RabbitWQ
         6 => 360, # 6 hrs
         7 => 720, # 12 hrs
         8 => 1440, # 24 hrs
+        9 => 2880, # 48 hrs
       }[retry_num] * 60000
     end
   end
