@@ -16,7 +16,6 @@ module RabbitWQ
       channel = mq.create_channel
 
       if delay
-        $stdout.puts "ENQUEUE delayed: #{delay}"
         delay_x = channel.direct( "#{DELAY_EXCHANGE_PREFIX}-#{delay}ms", durable: true )
         work_x  = channel.direct( WORK_EXCHANGE, durable: true )
 
@@ -31,7 +30,6 @@ module RabbitWQ
         return
       end
 
-      $stdout.puts "ENQUEUE"
       work_q = channel.queue( QUEUE, durable: true )
       work_q.publish( payload, durable: true,
                                headers: options )
