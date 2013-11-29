@@ -14,12 +14,11 @@ module RabbitWQ
       channel       = options[:channel]
       delivery_info = options[:delivery_info]
       metadata      = options[:metadata]
-      headers       = metadata[:headers]
+      #headers       = metadata[:headers]
       payload       = options[:payload]
 
       debug "PAYLOAD ARRIVED #{payload}"
 
-      $stdout.puts headers.inspect
       worker = YAML::load( payload )
       worker.call
       channel.ack delivery_info.delivery_tag
@@ -34,18 +33,26 @@ module RabbitWQ
       headers = metadata[:headers]
 
       if headers['retry']
-        retry_delay = headers.fetch( 'retry_delay', 30000 )
         attempt = headers.fetch( 'attempt', 1 ).to_i
 
-        if retry_delay == 'auto-scale'
-          retry_delay = retry_delays( attempt )
+        if attempt < headers['retry']
+          retry_delay = headers.fetch( 'retry_delay', 30000 )
+
+          if retry_delay == 'auto-scale'
+            retry_delay = retry_delays( attempt )
+          end
+
+          Work.enqueue_payload( payload, headers.merge( delay: retry_delay, attempt: attempt + 1 ))
+          channel.nack delivery_info.delivery_tag
+          return
         end
-
-        Work.enqueue_payload( payload, headers.merge( delay: retry_delay, attempt: attempt + 1 ))
-        channel.nack delivery_info.delivery_tag
-
-        return
       end
+
+      Work.enqueue_error_payload( payload, error: { type: e.class.name,
+                                                    message: e.message,
+                                                    backtrace: e.backtrace } )
+      channel.nack delivery_info.delivery_tag
+      return
     end
 
     def requeue( channel, delivery_info, e=nil )

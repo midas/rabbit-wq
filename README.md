@@ -64,3 +64,8 @@ Auto-scale will set up retries at the following intervals: 1 min, 5 mins, 15 min
     
     worker = SomeWorker.new( 1 )
     worker.work # same as RabbitWQ::Work.enqueue( worker )
+
+### Error Queue
+
+Once a worker has thrown an exception and no retry attempts are remaining, the worker is placed on 
+the error queue with the exception type, message and backtraces.

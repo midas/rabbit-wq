@@ -35,6 +35,14 @@ module RabbitWQ
                                headers: options )
     end
 
+    def self.enqueue_error_payload( payload, options={} )
+      mq = ::Bunny.new.tap { |bunny| bunny.start }
+      channel = mq.create_channel
+
+      error_q = channel.queue( ERROR_QUEUE, durable: true )
+      error_q.publish( payload, durable: true,
+                                headers: options )
+    end
 
   end
 end
