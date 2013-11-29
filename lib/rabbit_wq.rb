@@ -20,6 +20,7 @@ module RabbitWQ
   autoload :Server,         'rabbit_wq/server'
   autoload :ServerLogging,  'rabbit_wq/server_logging'
   autoload :Work,           'rabbit_wq/work'
+  autoload :Worker,         'rabbit_wq/worker'
 
   def self.configuration
     @configuration ||= Configuration.new
