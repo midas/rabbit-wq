@@ -37,7 +37,7 @@ module RabbitWQ
         retry_delay = headers.fetch( 'retry_delay', 30000 )
         attempt = headers.fetch( 'attempt', 1 ).to_i
 
-        if retry_delay == 'auto_scale'
+        if retry_delay == 'auto-scale'
           retry_delay = retry_delays( attempt )
         end
 
