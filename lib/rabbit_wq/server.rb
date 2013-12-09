@@ -14,7 +14,6 @@ module RabbitWQ
 
     def initialize( options )
       @options = options
-      options[:pool_size] ||= 2 # TODO move to external configuration
 
       configure_server
     end
@@ -46,18 +45,33 @@ module RabbitWQ
     end
 
     def pool
-      @pool ||= MessageHandler.pool( size: options[:pool_size] )
+      @pool ||= MessageHandler.pool( size: options[:threads] )
     end
 
     def run
+      if options[:threads] == 1
+        Celluloid::Actor[:message_handler] = MessageHandler.new
+      end
+
       @work_consumer = work_queue.subscribe( manual_ack: true ) do |delivery_info, metadata, payload|
         info "LISTENER RECEIVED #{payload}"
 
-        pool.async.call( payload: payload,
-                         delivery_info: delivery_info,
-                         metadata: metadata,
-                         channel: channel )
+        if options[:threads] > 1
+          pool.async.call( payload: payload,
+                           delivery_info: delivery_info,
+                           metadata: metadata,
+                           channel: channel )
+        else
+          message_handler.call( payload: payload,
+                                delivery_info: delivery_info,
+                                metadata: metadata,
+                                channel: channel )
+        end
       end
+    end
+
+    def message_handler
+      Celluloid::Actor[:message_handler]
     end
 
     def configure_server
