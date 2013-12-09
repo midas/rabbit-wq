@@ -18,6 +18,7 @@ module RabbitWQ
   autoload :Queues,         'rabbit_wq/queues'
   autoload :MessageHandler, 'rabbit_wq/message_handler'
   autoload :Server,         'rabbit_wq/server'
+  autoload :ServerDaemon,   'rabbit_wq/server_daemon'
   autoload :ServerLogging,  'rabbit_wq/server_logging'
   autoload :Work,           'rabbit_wq/work'
   autoload :Worker,         'rabbit_wq/worker'

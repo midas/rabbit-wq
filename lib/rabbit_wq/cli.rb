@@ -4,7 +4,10 @@ require 'trollop'
 require 'yell'
 
 module RabbitWQ
-  module Cli
+  class Cli
+
+    attr_reader :cmd,
+                :options
 
     SUB_COMMANDS = %w(
       restart
@@ -13,95 +16,112 @@ module RabbitWQ
       stop
     )
 
-    def self.start( options )
-      if options[:interactive]
-        start_interactive options
-      else
-        start_daemon options
+    DEFAULT_LOG_PATH = "/var/log/#{APP_ID}/#{APP_ID}.log"
+    DEFAULT_PID_PATH = "/var/run/#{APP_ID}/#{APP_ID}.pid"
+    #DEFAULT_LOG_PATH = "/Users/cjharrelson/#{APP_ID}.log"
+    #DEFAULT_PID_PATH = "/Users/cjharrelson/#{APP_ID}.pid"
+
+    DEFAULT_NUMBER_OF_THREADS = 1
+
+    def initialize( args )
+      Trollop::options do
+        version VERSION_COPYRIGHT
+        banner <<-EOS
+#{APP_NAME} #{VERSION_COPYRIGHT}
+
+Usage:
+  #{APP_ID} [command] [options]
+
+  commands:
+#{SUB_COMMANDS.map { |sub_cmd| "    #{sub_cmd}" }.join( "\n" )}
+
+  (For help with a command: #{APP_ID} [command] -h)
+
+options:
+      EOS
+        stop_on SUB_COMMANDS
+      end
+
+      # Get the sub-command and its options
+      #
+      @cmd = ARGV.shift || ''
+      @options = case( cmd )
+        when "restart"
+          Trollop::options do
+            opt :log_level, "The log level", :type => String, :default => 'info'
+            opt :log, "The path for the log file", :type => String, :short => '-l', :default => DEFAULT_LOG_PATH
+            opt :pid, "The path for the PID file", :type => String, :default => DEFAULT_PID_PATH
+            opt :threads, "The number of threads", :type => Integer, :default => DEFAULT_NUMBER_OF_THREADS, :short => '-t'
+          end
+        when "start"
+          Trollop::options do
+            opt :interactive, "Execute the server in interactive mode", :short => '-i'
+            opt :log_level, "The log level", :type => String, :default => 'info'
+            opt :log, "The path for the log file", :type => String, :short => '-l', :default => DEFAULT_LOG_PATH
+            opt :pid, "The path for the PID file", :type => String, :default => DEFAULT_PID_PATH
+            opt :threads, "The number of threads", :type => Integer, :default => DEFAULT_NUMBER_OF_THREADS, :short => '-t'
+          end
+        when "status"
+          Trollop::options do
+            opt :pid, "The path for the PID file", :type => String, :default => DEFAULT_PID_PATH
+          end
+        when "stop"
+          Trollop::options do
+            opt :pid, "The path for the PID file", :type => String, :default => DEFAULT_PID_PATH
+          end
+        else
+          Trollop::die "unknown command #{cmd.inspect}"
+        end
+
+      if cmd == 'start'
+        unless options[:interactive]
+          Trollop::die( :log, "is required when running as daemon" ) unless options[:log]
+          Trollop::die( :pid, "is required when running as daemon" ) unless options[:pid]
+        end
+      end
+
+      if %w(restart status stop).include?( cmd )
+        Trollop::die( :pid, "is required" ) unless options[:pid]
       end
     end
 
-    def self.start_interactive( options )
-      server = RabbitWQ::Server.new( options.merge( log: nil ) )
+    def run
+      send( cmd )
+    end
+
+  protected
+
+    def start
+      if options[:interactive]
+        start_interactive
+      else
+        start_daemon
+      end
+    end
+
+    def start_interactive
+      server = RabbitWQ::Server.new( options.merge( log: nil ))
       server.start
     end
 
-    def self.start_daemon( options )
+    def start_daemon
       server = RabbitWQ::ServerDaemon.new( options )
       server.start
     end
 
-  end
-end
-
-DEFAULT_LOG_PATH = "/var/log/rabbit-wq/#{RabbitWQ::APP_ID}.log"
-DEFAULT_PID_PATH = "/var/run/rabbit-wq/#{RabbitWQ::APP_ID}.pid"
-
-global_opts = Trollop::options do
-  version RabbitWQ::VERSION_COPYRIGHT
-  banner <<-EOS
-#{RabbitWQ::APP_NAME} #{RabbitWQ::VERSION_COPYRIGHT}
-
-Usage:
-  #{RabbitWQ::APP_ID} [command] [options]
-
-  commands:
-#{RabbitWQ::Cli::SUB_COMMANDS.map { |cmd| "    #{cmd}" }.join( "\n" )}
-
-  (For help with a command: #{RabbitWQ::APP_ID} [command] -h)
-
-options:
-EOS
-  stop_on RabbitWQ::Cli::SUB_COMMANDS
-end
-
-# Get the sub-command and its options
-#
-cmd = ARGV.shift || ''
-cmd_opts = case( cmd )
-  #when "restart"
-    #Trollop::options do
-      #opt :pid, "The path for the PID file", :type => String, :default => DEFAULT_PID_PATH
-    #end
-  when "start"
-    Trollop::options do
-      opt :interactive, "Execute the server in interactive mode", :short => '-i'
-      opt :log_level, "The log level", :type => String, :default => 'info'
-      opt :log, "The path for the log file", :type => String, :short => '-l', :default => DEFAULT_LOG_PATH
-      opt :pid, "The path for the PID file", :type => String, :default => DEFAULT_PID_PATH
+    def stop
+      server = RabbitWQ::ServerDaemon.new( options )
+      server.stop
     end
-  #when "status"
-    #Trollop::options do
-      #opt :pid, "The path for the PID file", :type => String, :default => DEFAULT_PID_PATH
-    #end
-  #when "stop"
-    #Trollop::options do
-      #opt :pid, "The path for the PID file", :type => String, :default => DEFAULT_PID_PATH
-    #end
-  else
-    Trollop::die "unknown command #{cmd.inspect}"
-  end
 
-if cmd == 'start'
-  unless cmd_opts[:interactive]
-    Trollop::die( :log, "is required when running as daemon" ) unless cmd_opts[:log]
-    Trollop::die( :pid, "is required when running as daemon" ) unless cmd_opts[:pid]
+    def restart
+      stop
+      start_daemon
+    end
+
+    def status
+      RabbitWQ::ServerDaemon.new( options ).status
+    end
+
   end
 end
-
-if %w(restart status stop).include?( cmd )
-  Trollop::die( :pid, "is required" ) unless cmd_opts[:pid]
-end
-
-# Execute the command
-#
-case cmd
-  when "restart"
-    RabbitWQ::ServerDaemon.new( cmd_opts ).restart
-  when "start"
-    RabbitWQ::Cli.start cmd_opts
-  when "status"
-    RabbitWQ::ServerDaemon.new( cmd_opts ).status
-  when "stop"
-    RabbitWQ::ServerDaemon.new( cmd_opts ).stop
-  end

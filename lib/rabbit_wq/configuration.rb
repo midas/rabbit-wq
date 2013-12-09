@@ -1,12 +1,12 @@
 module RabbitWQ
   class Configuration
 
-    #def authentication_token
-      #@authentication_token
+    #def environment_file
+      #@environment_file
     #end
 
-    #def authentication_token=( authentication_token )
-      #@authentication_token = authentication_token
+    #def environment_file=( environment_file )
+      #@environment_file = environment_file
     #end
 
   end
