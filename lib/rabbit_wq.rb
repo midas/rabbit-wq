@@ -1,16 +1,12 @@
-require "rabbit_wq/version"
+require 'ansi'
+require 'rabbit_wq/version'
 
 module RabbitWQ
 
-  APP_ID                = "rabbit-wq"
-  APP_NAME              = "Rabbit Work Queue"
-  DELAY_QUEUE_PREFIX    = "work-delay" # TODO: Make this configurable (from ENV, or file?)
-  DELAY_EXCHANGE_PREFIX = "work-delay" # TODO: Make this configurable (from ENV, or file?)
-  ERROR_QUEUE           = "work-error"
-  INT                   = "INT"
-  QUEUE                 = "work" # TODO: Make this configurable (from ENV, or file?)
+  APP_ID                = 'rabbit-wq'
+  APP_NAME              = 'Rabbit Work Queue'
+  INT                   = 'INT'
   VERSION_COPYRIGHT     = "v#{VERSION} \u00A9#{Time.now.year}"
-  WORK_EXCHANGE         = "work" # TODO: Make this configurable (from ENV, or file?)
 
   autoload :Command,        'rabbit_wq/command'
   autoload :Configuration,  'rabbit_wq/configuration'
@@ -22,9 +18,14 @@ module RabbitWQ
   autoload :ServerLogging,  'rabbit_wq/server_logging'
   autoload :Work,           'rabbit_wq/work'
   autoload :Worker,         'rabbit_wq/worker'
+  autoload :WorkLogger,     'rabbit_wq/work_logger'
 
   def self.configuration
     @configuration ||= Configuration.new
+  end
+
+  def self.configuration=( configuration )
+    @configuration = configuration
   end
 
   def self.configure
@@ -32,7 +33,8 @@ module RabbitWQ
   end
 
   class << self
-    attr_accessor :logger
+    attr_accessor :logger,
+                  :work_logger
   end
 
 end

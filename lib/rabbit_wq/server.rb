@@ -35,11 +35,11 @@ module RabbitWQ
     end
 
     def work_exchange
-      @work_exchange ||= channel.direct( WORK_EXCHANGE, durable: true )
+      @work_exchange ||= channel.direct( config.work_exchange, durable: true )
     end
 
     def work_queue
-      @work_queue ||= channel.queue( QUEUE,
+      @work_queue ||= channel.queue( config.work_queue,
                                      durable: true ).
                               bind( work_exchange )
     end
@@ -74,8 +74,34 @@ module RabbitWQ
       Celluloid::Actor[:message_handler]
     end
 
+    def config
+      RabbitWQ.configuration
+    end
+
     def configure_server
+      load_configuration
       initialize_loggers
+      load_environment
+    end
+
+    def load_configuration
+      if File.exists?( options[:config] )
+        options[:config_loaded] = true
+        Configuration.from_file( options[:config] )
+      end
+    end
+
+    def load_environment
+      unless environment_file_path &&
+        File.exists?( environment_file_path )
+        return
+      end
+
+      require environment_file_path
+    end
+
+    def environment_file_path
+      RabbitWQ.configuration.environment_file_path
     end
 
   end

@@ -11,6 +11,8 @@ module RabbitWQ
     REQUEUE = true
 
     def call( options )
+      Time.zone = RabbitWQ.configuration.time_zone
+
       channel       = options[:channel]
       delivery_info = options[:delivery_info]
       metadata      = options[:metadata]
@@ -23,14 +25,17 @@ module RabbitWQ
       worker.call
       channel.ack delivery_info.delivery_tag
     rescue => e
-      debug e.message
-      handle_error( e, channel, delivery_info, payload, metadata )
+      handle_error( worker, e, channel, delivery_info, payload, metadata )
     end
 
   protected
 
-    def handle_error( e, channel, delivery_info, payload, metadata )
+    def handle_error( worker, e, channel, delivery_info, payload, metadata )
       headers = metadata[:headers]
+
+      error_metadata = { type: e.class.name,
+                         message: e.message,
+                         backtrace: e.backtrace }
 
       if headers['retry']
         attempt = headers.fetch( 'attempt', 1 ).to_i
@@ -42,15 +47,15 @@ module RabbitWQ
             retry_delay = retry_delays( attempt )
           end
 
-          Work.enqueue_payload( payload, headers.merge( delay: retry_delay, attempt: attempt + 1 ))
+          Work.enqueue_payload( payload, headers.merge( delay: retry_delay, attempt: attempt + 1 ).
+                                                 merge( error: error_metadata ))
           channel.nack delivery_info.delivery_tag
           return
         end
       end
 
-      Work.enqueue_error_payload( payload, error: { type: e.class.name,
-                                                    message: e.message,
-                                                    backtrace: e.backtrace } )
+      Work.enqueue_error_payload( payload, error: error_metadata )
+      worker_error( worker, error_metadata.inspect )
       channel.nack delivery_info.delivery_tag
       return
     end

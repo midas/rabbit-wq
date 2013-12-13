@@ -1,4 +1,4 @@
-require 'rubygems'
+ require 'rubygems'
 require 'rabbit_wq'
 require 'trollop'
 require 'yell'
@@ -16,10 +16,9 @@ module RabbitWQ
       stop
     )
 
-    DEFAULT_LOG_PATH = "/var/log/#{APP_ID}/#{APP_ID}.log"
-    DEFAULT_PID_PATH = "/var/run/#{APP_ID}/#{APP_ID}.pid"
-    #DEFAULT_LOG_PATH = "/Users/cjharrelson/#{APP_ID}.log"
-    #DEFAULT_PID_PATH = "/Users/cjharrelson/#{APP_ID}.pid"
+    DEFAULT_CONFIG_PATH = "/etc/#{APP_ID}/#{APP_ID}.conf"
+    DEFAULT_LOG_PATH    = "/var/log/#{APP_ID}/#{APP_ID}.log"
+    DEFAULT_PID_PATH    = "/var/run/#{APP_ID}/#{APP_ID}.pid"
 
     DEFAULT_NUMBER_OF_THREADS = 1
 
@@ -48,6 +47,7 @@ options:
       @options = case( cmd )
         when "restart"
           Trollop::options do
+            opt :config, "The path for the config file", :type => String, :short => '-c', :default => DEFAULT_CONFIG_PATH
             opt :log_level, "The log level", :type => String, :default => 'info'
             opt :log, "The path for the log file", :type => String, :short => '-l', :default => DEFAULT_LOG_PATH
             opt :pid, "The path for the PID file", :type => String, :default => DEFAULT_PID_PATH
@@ -55,6 +55,7 @@ options:
           end
         when "start"
           Trollop::options do
+            opt :config, "The path for the config file", :type => String, :short => '-c', :default => DEFAULT_CONFIG_PATH
             opt :interactive, "Execute the server in interactive mode", :short => '-i'
             opt :log_level, "The log level", :type => String, :default => 'info'
             opt :log, "The path for the log file", :type => String, :short => '-l', :default => DEFAULT_LOG_PATH
@@ -75,6 +76,7 @@ options:
 
       if cmd == 'start'
         unless options[:interactive]
+          Trollop::die( :config, "is required when running as daemon" ) unless options[:config]
           Trollop::die( :log, "is required when running as daemon" ) unless options[:log]
           Trollop::die( :pid, "is required when running as daemon" ) unless options[:pid]
         end

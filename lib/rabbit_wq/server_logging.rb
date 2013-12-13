@@ -8,23 +8,16 @@ module RabbitWQ
   protected
 
     def initialize_loggers
-      if options[:interactive] || options[:log].nil? || options[:log].empty?
-        RabbitWQ.logger = Yell.new do |l|
-          l.level = log_level
-          l.adapter $stdout, :level => [:debug, :info, :warn]
-          l.adapter $stderr, :level => [:error, :fatal]
-        end
-      else
-        RabbitWQ.logger = Yell.new do |l|
-          l.level = log_level
-          l.adapter :file, options[:log]
-        end
-
-        Celluloid.logger = Yell.new do |l|
-          l.level = :info
-          l.adapter :file, File.join( File.dirname( options[:log] ), "#{APP_ID}-celluloid.log" )
-        end
+      RabbitWQ.logger = Yell.new do |l|
+        l.level = log_level
+        l.adapter $stdout, :level => [:debug, :info, :warn]
+        l.adapter $stderr, :level => [:error, :fatal]
       end
+
+      #Celluloid.logger = Yell.new do |l|
+        #l.level = :info
+        #l.adapter :file, File.join( File.dirname( options[:log] ), "#{APP_ID}-celluloid.log" )
+      #end
     end
 
     def log_startup
@@ -37,12 +30,16 @@ module RabbitWQ
       [
         "",
         "***",
-        "* #{RabbitWQ::APP_NAME} started",
+        "* #{APP_NAME} started",
         "*",
         "* #{VERSION_COPYRIGHT}",
+        "*",
+        "* Configuration:",
+        (options[:config_loaded] ? "*   file: #{options[:config]}" : nil),
+        RabbitWQ::Configuration.attributes.map { |a| "*   #{a}: #{RabbitWQ.configuration.send( a )}" },
+        "*",
         "***",
-        "",
-      ]
+      ].flatten.reject( &:nil? )
     end
 
     def log_level
