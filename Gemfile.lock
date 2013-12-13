@@ -1,0 +1,30 @@
+PATH
+  remote: .
+  specs:
+    rabbit-wq (0.2.0)
+      bunny (~> 1)
+      celluloid (~> 0)
+      oj (~> 2)
+      trollop (~> 2)
+      yell (~> 1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    amq-protocol (1.9.0)
+    bunny (1.0.5)
+      amq-protocol (>= 1.9.0)
+    celluloid (0.15.2)
+      timers (~> 1.1.0)
+    oj (2.3.0)
+    rake (10.1.0)
+    timers (1.1.0)
+    trollop (2.0)
+    yell (1.5.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  rabbit-wq!
+  rake
