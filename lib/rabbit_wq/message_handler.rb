@@ -22,6 +22,7 @@ module RabbitWQ
       debug "PAYLOAD ARRIVED #{payload}"
 
       worker = YAML::load( payload )
+      info ANSI.yellow { "WORKER [#{worker.object_id}] " + worker.inspect }
       worker.call
       channel.ack delivery_info.delivery_tag
     rescue => e
