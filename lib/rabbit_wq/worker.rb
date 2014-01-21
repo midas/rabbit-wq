@@ -27,5 +27,11 @@ module RabbitWQ
       self
     end
 
+    def with_logging
+      info "BEGIN #{self.class.name}"
+      yield
+      info "END #{self.class.name}"
+    end
+
   end
 end
