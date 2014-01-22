@@ -12,6 +12,8 @@ module RabbitWQ
         error_queue
         time_zone
         work_exchange
+        work_log_level
+        work_log_path
         work_queue
       )
     end
@@ -53,10 +55,12 @@ module RabbitWQ
       @work_exchange || 'work'
     end
 
-    def work_logger( log_level, path )
-      return if RabbitWQ.work_logger
+    def work_log_level
+      @work_log_level || 'info'
+    end
 
-      RabbitWQ.work_logger = WorkLogger.new( log_level, path )
+    def work_log_path
+      @work_log_path || '/var/log/rabbit-wq/rabbit-wq-work.log'
     end
 
     def work_queue

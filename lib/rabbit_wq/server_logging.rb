@@ -14,6 +14,8 @@ module RabbitWQ
         l.adapter $stderr, :level => [:error, :fatal]
       end
 
+      RabbitWQ.work_logger = WorkLogger.new( RabbitWQ.configuration.work_log_level,
+                                             RabbitWQ.configuration.work_log_path )
       #Celluloid.logger = Yell.new do |l|
         #l.level = :info
         #l.adapter :file, File.join( File.dirname( options[:log] ), "#{APP_ID}-celluloid.log" )
