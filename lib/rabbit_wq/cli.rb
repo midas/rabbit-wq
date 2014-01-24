@@ -1,4 +1,4 @@
- require 'rubygems'
+require 'rubygems'
 require 'rabbit_wq'
 require 'trollop'
 require 'yell'
