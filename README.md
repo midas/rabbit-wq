@@ -2,8 +2,6 @@
 
 A work queue built on RabbitMQ and Celluloid.
 
-This is NOT production ready.  Released only to reserve gem name.
-
 
 ## Installation
 
@@ -22,7 +20,32 @@ Or install it yourself as:
 
 ## Usage
 
-### Queueing Work
+### Queue Subscriber
+
+#### Starting the Work Queue Subscriber in Interactive Mode
+
+    $ rabbit-wq start --interactive
+
+#### Starting the Work Queue Subscriber as a Daemon
+
+    $ rabbit-wq start
+
+#### Stopping the Work Queue Subscriber
+
+    $ rabbit-wq stop
+
+#### Restarting the Work Queue Subscriber
+
+    $ rabbit-wq restart
+
+#### Checking the Status of the Work Queue Subscriber
+
+    $ rabbit-wq status
+
+
+#### Queueing Work
+
+#### Implementing as a PORO
 
     class SomeWorker < Struct.new( :some_variable )
       def call
@@ -33,15 +56,15 @@ Or install it yourself as:
     worker = SomeWorker.new( 1 )
     RabbitWQ::Work.enqueue( worker )
 
-### Queueing Work in the Future
+#### Work in the Future
 
     RabbitWQ::Work.enqueue( worker, delay: 30000 )
 
-### Queueing Work with a Retry
+#### Queueing Work with a Retry
 
     RabbitWQ::Work.enqueue( worker, retry: 1 )
 
-### Queueing Work with a Retry and a Retry Delay
+#### Queueing Work with a Retry and a Retry Delay
 
     RabbitWQ::Work.enqueue( worker, retry: 1, retry_delay: 30000 )
 
@@ -52,7 +75,7 @@ Or install it yourself as:
 Auto-scale will set up retries at the following intervals: 1 min, 5 mins, 15 mins, 30 mins, 
 1 hr, 6 hrs, 12 hrs, 24 hrs. and 48 hrs.
 
-### Using the Worker Module
+#### Implementing with the Worker Module
 
     class SomeWorker < Struct.new( :some_variable )
       include RabbitWQ::Worker
@@ -90,3 +113,92 @@ do not have to provide a refrence to self in this case.
     end
 
 The RabbitWQ loggers provide the following log levels: debug, info, warn, error and fatal.
+
+### Configuration File
+
+The RabbitWQ configuration file uses JSON syntax.  The default location for the configuration file is /var/run/rabbit-wq/rabbit-wq.conf
+
+Here is an example configuration file with each option's default value:
+
+    {
+      "delayed_exchange_prefix": "work-delay",
+      "delayed_queue_prefix": "work-delay",
+      "environment_file_path": nil,
+      "env": "production",
+      "error_queue": "work-error",
+      "threads": 1,
+      "time_zone": "UTC",
+      "work_exchange": "work",
+      "work_log_level": "info",
+      "work_log_path": "/var/log/rabbit-wq/rabbit-wq-work.log",
+      "work_queue": "work"
+    }
+
+#### Options
+
+#####delayed_exchange_prefix
+The prefix for the delayed exchanges.  Defaults to work-delay.
+
+#####delayed_queue_prefix
+The prefix for the delayed queues.  Defaults to work-delay.
+
+#####environment_file_path
+The path to the environment file (loads all or some of application environment).  No default.
+
+#####env
+The environment to run in.  Defaults to production.
+
+#####error_queue
+The name of the error queue. Defaults to error.
+
+#####threads
+The size of the thread pool.  Can be overridden with the command line option --threads or -t.  Defaults to 1.
+
+#####time_zone
+The time zone to use with ActiveRecord.
+
+#####work_exchange
+The name of the work exchange.  Defaults to work.
+
+#####work_log_level
+The log level of the worker logger.  Defaults to info.
+
+#####work_log_path
+The path the worker logger will log to. Defaults to /var/log/rabbit-wq/rabbit-wq-work.log.
+
+#####work_queue
+The name of the work queue.  Defaults to work.
+
+
+### Command Line Interface
+
+#### Commands
+
+#####start
+Starts the subscriber.
+
+#####stop
+Stops the subscriber.
+
+#####restart
+Restarts the subscriber.
+
+#####status
+Reports the status of the subscriber, started or stopped.
+
+#### Options
+
+#####config (--config or -c)
+The path for the configuration file.  Defaults to /etc/rabbit-wq/rabbit-wq.conf.
+
+#####log_level (--log_level)
+The log level for the work subscriber's logger.  This does not have an effect on the worker logger.  Defaults to info.
+
+#####log (--log or -l)
+The path for the work subsciber's log file.  Defaults to /var/log/rabbit-wq/rabbit-wq.log.
+
+#####pid (--pid)
+The path to the PID file.  Defaults to /var/run/rabbit-wq/rabbit-wq.pid.
+
+#####interactive (--interactive or -i)
+When used the work subscriber is executed in interactive (attached) mode as opposed to as a daemon.
