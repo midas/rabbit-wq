@@ -20,8 +20,6 @@ module RabbitWQ
     DEFAULT_LOG_PATH    = "/var/log/#{APP_ID}/#{APP_ID}.log"
     DEFAULT_PID_PATH    = "/var/run/#{APP_ID}/#{APP_ID}.pid"
 
-    DEFAULT_NUMBER_OF_THREADS = 1
-
     def initialize( args )
       Trollop::options do
         version VERSION_COPYRIGHT
@@ -51,7 +49,7 @@ options:
             opt :log_level, "The log level", :type => String, :default => 'info'
             opt :log, "The path for the log file", :type => String, :short => '-l', :default => DEFAULT_LOG_PATH
             opt :pid, "The path for the PID file", :type => String, :default => DEFAULT_PID_PATH
-            opt :threads, "The number of threads", :type => Integer, :default => DEFAULT_NUMBER_OF_THREADS, :short => '-t'
+            opt :threads, "The number of threads", :type => Integer, :short => '-t'
           end
         when "start"
           Trollop::options do
@@ -60,7 +58,7 @@ options:
             opt :log_level, "The log level", :type => String, :default => 'info'
             opt :log, "The path for the log file", :type => String, :short => '-l', :default => DEFAULT_LOG_PATH
             opt :pid, "The path for the PID file", :type => String, :default => DEFAULT_PID_PATH
-            opt :threads, "The number of threads", :type => Integer, :default => DEFAULT_NUMBER_OF_THREADS, :short => '-t'
+            opt :threads, "The number of threads", :type => Integer, :short => '-t'
           end
         when "status"
           Trollop::options do

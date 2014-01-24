@@ -10,6 +10,7 @@ module RabbitWQ
         environment_file_path
         env
         error_queue
+        threads
         time_zone
         work_exchange
         work_log_level

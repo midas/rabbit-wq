@@ -45,18 +45,20 @@ module RabbitWQ
     end
 
     def pool
-      @pool ||= MessageHandler.pool( size: options[:threads] )
+      @pool ||= MessageHandler.pool( size: threads )
     end
 
     def run
-      if options[:threads] == 1
+      if threads == 1
         Celluloid::Actor[:message_handler] = MessageHandler.new
       end
+
+      info "threads: #{threads}"
 
       @work_consumer = work_queue.subscribe( manual_ack: true ) do |delivery_info, metadata, payload|
         info "LISTENER RECEIVED #{payload}"
 
-        if options[:threads] > 1
+        if threads > 1
           pool.async.call( payload: payload,
                            delivery_info: delivery_info,
                            metadata: metadata,
@@ -74,6 +76,10 @@ module RabbitWQ
       Celluloid::Actor[:message_handler]
     end
 
+    def threads
+      config.threads
+    end
+
     def config
       RabbitWQ.configuration
     end
@@ -82,6 +88,7 @@ module RabbitWQ
       load_configuration
       initialize_loggers
       load_environment
+      resolve_threads
     end
 
     def load_configuration
@@ -98,6 +105,16 @@ module RabbitWQ
       end
 
       require environment_file_path
+    end
+
+    def resolve_threads
+      if options[:threads]
+        RabbitWQ.configuration.threads = options[:threads]
+      end
+
+      return if RabbitWQ.configuration.threads
+
+      RabbitWQ.configuration.threads = 1
     end
 
     def environment_file_path
