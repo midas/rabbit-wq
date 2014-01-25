@@ -53,8 +53,6 @@ module RabbitWQ
         Celluloid::Actor[:message_handler] = MessageHandler.new
       end
 
-      info "threads: #{threads}"
-
       @work_consumer = work_queue.subscribe( manual_ack: true ) do |delivery_info, metadata, payload|
         info "LISTENER RECEIVED #{payload}"
 
