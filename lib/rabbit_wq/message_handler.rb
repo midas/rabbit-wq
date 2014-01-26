@@ -16,10 +16,7 @@ module RabbitWQ
       channel       = options[:channel]
       delivery_info = options[:delivery_info]
       metadata      = options[:metadata]
-      #headers       = metadata[:headers]
       payload       = options[:payload]
-
-      debug "PAYLOAD ARRIVED #{payload}"
 
       worker = YAML::load( payload )
       info ANSI.yellow { "WORKER [#{worker.object_id}] " + worker.inspect }
