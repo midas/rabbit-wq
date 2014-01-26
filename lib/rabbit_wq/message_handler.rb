@@ -50,13 +50,14 @@ module RabbitWQ
 
           Work.enqueue_payload( payload, headers.merge( delay: retry_delay, attempt: attempt + 1 ).
                                                  merge( error: error_metadata ))
+          worker_error( worker, "ERROR WITH RETRY " + error_metadata.inspect )
           channel.nack delivery_info.delivery_tag
           return
         end
       end
 
       Work.enqueue_error_payload( payload, error: error_metadata )
-      worker_error( worker, error_metadata.inspect )
+      worker_error( worker, "FINAL ERROR " + error_metadata.inspect )
       channel.nack delivery_info.delivery_tag
       return
     end
