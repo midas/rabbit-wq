@@ -21,6 +21,7 @@ module RabbitWQ
       worker = YAML::load( payload )
       info ANSI.yellow { "WORKER [#{worker.object_id}] " + worker.inspect }
       worker.call
+      try_on_success_callback( worker )
       channel.ack delivery_info.delivery_tag
     rescue => e
       handle_error( worker, e, channel, delivery_info, payload, metadata )
@@ -48,6 +49,8 @@ module RabbitWQ
           Work.enqueue_payload( payload, headers.merge( delay: retry_delay, attempt: attempt + 1 ).
                                                  merge( error: error_metadata ))
           worker_error( worker, "ERROR WITH RETRY " + error_metadata.inspect )
+          try_on_error_callback( worker, e )
+          try_on_retryable_error_callback( worker, e )
           channel.nack delivery_info.delivery_tag
           return
         end
@@ -55,8 +58,29 @@ module RabbitWQ
 
       Work.enqueue_error_payload( payload, error: error_metadata )
       worker_error( worker, "FINAL ERROR " + error_metadata.inspect )
+      try_on_error_callback( worker, e )
+      try_on_final_error_callback( worker, e )
       channel.nack delivery_info.delivery_tag
-      return
+    end
+
+    def try_on_success_callback( worker )
+      return unless worker.respond_to?( :on_success )
+      worker.on_success
+    end
+
+    def try_on_error_callback( worker, e )
+      return unless worker.respond_to?( :on_error )
+      worker.on_error( e )
+    end
+
+    def try_on_retryable_error_callback( worker, e )
+      return unless worker.respond_to?( :on_retryable_error )
+      worker.on_retryable_error( e )
+    end
+
+    def try_on_final_error_callback( worker, e )
+      return unless worker.respond_to?( :on_final_error )
+      worker.on_final_error( e )
     end
 
     def requeue( channel, delivery_info, e=nil )

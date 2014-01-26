@@ -88,10 +88,34 @@ Auto-scale will set up retries at the following intervals: 1 min, 5 mins, 15 min
     worker = SomeWorker.new( 1 )
     worker.work # same as RabbitWQ::Work.enqueue( worker )
 
-### Error Queue
+### Success Callback
 
-Once a worker has thrown an exception and no retry attempts are remaining, the worker is placed on 
+#### on_success
+
+Called on success when defined on a worker.
+
+
+### Error Handling
+
+Once a worker has raised an exception and no retry attempts are remaining, the worker is placed on 
 the error queue with the exception type, message and backtraces.
+
+#### Error Callbacks
+
+There are several error callbacks that will be called if defined on a worker.  Each error callback will receive
+a single parameter, the error.
+
+##### on_error
+
+Called anytime an error is raised, including if a retry will be attempted.
+
+##### on_final_error
+
+Called when an error is raised and either no retries were requested or are remaining.
+
+##### on_retryable_error
+
+Called when an error is raised and a retry will be attempted.
 
 ### Logging
 
