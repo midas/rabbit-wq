@@ -36,9 +36,6 @@ module RabbitWQ
 
     end
 
-    def level=( l )
-    end
-
   protected
 
     attr_reader :logger
