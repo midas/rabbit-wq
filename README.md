@@ -153,6 +153,7 @@ Here is an example configuration file with each option's default value:
       "threads": 1,
       "time_zone": "UTC",
       "work_exchange": "work",
+      "work_exchange_type": "fanout",
       "work_log_level": "info",
       "work_log_path": "/var/log/rabbit-wq/rabbit-wq-work.log",
       "work_queue": "work"
@@ -183,6 +184,9 @@ The time zone to use with ActiveRecord.
 
 #####work_exchange
 The name of the work exchange.  Defaults to work.
+
+#####work_exchange_type
+The RabbitMQ exchange type of the work exchange.  Defaults to fanout.  For more information see [RabbitMQ Docs](https://www.rabbitmq.com/tutorials/amqp-concepts.html).
 
 #####work_log_level
 The log level of the worker logger.  Defaults to info.
