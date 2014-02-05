@@ -13,6 +13,7 @@ module RabbitWQ
         threads
         time_zone
         work_exchange
+        work_exchange_type
         work_log_level
         work_log_path
         work_queue
@@ -54,6 +55,10 @@ module RabbitWQ
 
     def work_exchange
       @work_exchange || 'work'
+    end
+
+    def work_exchange_type
+      @work_exchange_type || 'fanout'
     end
 
     def work_log_level

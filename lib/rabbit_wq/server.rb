@@ -35,7 +35,8 @@ module RabbitWQ
     end
 
     def work_exchange
-      @work_exchange ||= channel.direct( config.work_exchange, durable: true )
+      @work_exchange ||= channel.send( config.work_exchange_type,
+                                       config.work_exchange, durable: true )
     end
 
     def work_queue
