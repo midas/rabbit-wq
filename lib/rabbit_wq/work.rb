@@ -15,7 +15,10 @@ module RabbitWQ
       if delay
         with_channel do |channel|
           delay_x = channel.direct( "#{RabbitWQ.configuration.delayed_exchange_prefix}-#{delay}ms", durable: true )
-          work_x  = channel.direct( RabbitWQ.configuration.work_exchange, durable: true )
+
+          work_x = channel.send( RabbitWQ.configuration.work_exchange_type,
+                                 RabbitWQ.configuration.work_exchange,
+                                 durable: true )
 
           channel.queue( "#{RabbitWQ.configuration.delayed_queue_prefix}-#{delay}ms",
                          durable: true,
@@ -50,7 +53,10 @@ module RabbitWQ
     def self.with_work_exchange
       with_channel do |channel|
         begin
-          exchange = channel.direct( RabbitWQ.configuration.work_exchange, durable: true )
+          exchange = channel.send( RabbitWQ.configuration.work_exchange_type,
+                                   RabbitWQ.configuration.work_exchange,
+                                   durable: true )
+
           channel.queue( RabbitWQ.configuration.work_queue, durable: true ).tap do |q|
             q.bind( exchange )
             yield exchange, q
