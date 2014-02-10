@@ -103,6 +103,7 @@ module RabbitWQ
         return
       end
 
+      ENV['RAILS_ENV'] = ENV['RACK_ENV'] = config.env
       require environment_file_path
     end
 
