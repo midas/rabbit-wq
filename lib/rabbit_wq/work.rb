@@ -3,6 +3,8 @@ require 'bunny'
 module RabbitWQ
   module Work
 
+    YAML_MIMETYPE = 'application/yaml'
+
     def self.enqueue( worker, options={} )
       payload = worker.to_yaml
       enqueue_payload( payload, options )
@@ -27,7 +29,7 @@ module RabbitWQ
                   bind( delay_x )
 
           delay_x.publish( payload, durable: true,
-                                    content_type: 'application/yaml',
+                                    content_type: YAML_MIMETYPE,
                                     headers: options )
         end
 
@@ -36,7 +38,7 @@ module RabbitWQ
 
       with_work_exchange do |work_x, work_q|
         work_x.publish( payload, durable: true,
-                                 content_type: 'application/yaml',
+                                 content_type: YAML_MIMETYPE,
                                  headers: options )
       end
     end
@@ -45,7 +47,7 @@ module RabbitWQ
       with_channel do |channel|
         error_q = channel.queue( config.error_queue, durable: true )
         error_q.publish( payload, durable: true,
-                                  content_type: 'application/yaml',
+                                  content_type: YAML_MIMETYPE,
                                   headers: options )
       end
     end
