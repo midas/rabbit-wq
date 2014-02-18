@@ -14,13 +14,13 @@ module RabbitWQ
 
       if delay
         with_channel do |channel|
-          delay_x = channel.direct( "#{RabbitWQ.configuration.delayed_exchange_prefix}-#{delay}ms", durable: true )
+          delay_x = channel.direct( "#{config.delayed_exchange_prefix}-#{delay}ms", durable: true )
 
-          work_x = channel.send( RabbitWQ.configuration.work_exchange_type,
-                                 RabbitWQ.configuration.work_exchange,
+          work_x = channel.send( config.work_exchange_type,
+                                 config.work_exchange,
                                  durable: true )
 
-          channel.queue( "#{RabbitWQ.configuration.delayed_queue_prefix}-#{delay}ms",
+          channel.queue( "#{config.delayed_queue_prefix}-#{delay}ms",
                          durable: true,
                          arguments: { "x-dead-letter-exchange" => work_x.name,
                                       "x-message-ttl" => delay } ).
@@ -43,7 +43,7 @@ module RabbitWQ
 
     def self.enqueue_error_payload( payload, options={} )
       with_channel do |channel|
-        error_q = channel.queue( RabbitWQ.configuration.error_queue, durable: true )
+        error_q = channel.queue( config.error_queue, durable: true )
         error_q.publish( payload, durable: true,
                                   content_type: 'application/yaml',
                                   headers: options )
@@ -53,11 +53,11 @@ module RabbitWQ
     def self.with_work_exchange
       with_channel do |channel|
         begin
-          exchange = channel.send( RabbitWQ.configuration.work_exchange_type,
-                                   RabbitWQ.configuration.work_exchange,
+          exchange = channel.send( config.work_exchange_type,
+                                   config.work_exchange,
                                    durable: true )
 
-          channel.queue( RabbitWQ.configuration.work_queue, durable: true ).tap do |q|
+          channel.queue( config.work_queue, durable: true ).tap do |q|
             q.bind( exchange )
             yield exchange, q
           end
@@ -79,19 +79,9 @@ module RabbitWQ
       end
     end
 
-    #def self.with_exchange
-      #Bunny.new.tap do |b|
-        #b.start
-        #begin
-          #b.create_channel.tap do |c|
-            #queue = c.queue( 'replication', durable: true )
-            #yield c.default_exchange, queue.name
-          #end
-        #ensure
-          #b.stop
-        #end
-      #end
-    #end
+    def self.config
+      RabbitWQ.configuration
+    end
 
   end
 end
