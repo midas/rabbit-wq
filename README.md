@@ -138,6 +138,13 @@ do not have to provide a refrence to self in this case.
 
 The RabbitWQ loggers provide the following log levels: debug, info, warn, error and fatal.
 
+### Work Publish vs. Subscribe Queue
+
+Quite often the work publish and subscribe queues are the same queue.  However, certain use cases require a seprarate work publish
+and subscribe queue.  For instance, when you use te RabbitMQ shovel plugin to effectively create a distributed queue, you may want 
+to publish to a local queue that is shoveled to a central work queue, where the subscriber resides and performs the actual work.
+
+
 ### Configuration File
 
 The RabbitWQ configuration file uses JSON syntax.  The default location for the configuration file is /var/run/rabbit-wq/rabbit-wq.conf
@@ -156,7 +163,8 @@ Here is an example configuration file with each option's default value:
       "work_exchange_type": "fanout",
       "work_log_level": "info",
       "work_log_path": "/var/log/rabbit-wq/rabbit-wq-work.log",
-      "work_queue": "work"
+      "work_publish_queue": "work"
+      "work_subscribe_queue": "work"
     }
 
 #### Options
@@ -194,8 +202,11 @@ The log level of the worker logger.  Defaults to info.
 #####work_log_path
 The path the worker logger will log to. Defaults to /var/log/rabbit-wq/rabbit-wq-work.log.
 
-#####work_queue
-The name of the work queue.  Defaults to work.
+#####work_publish_queue
+The name of the work queue to publish to.  Defaults to work.
+
+#####work_subscribe_queue
+The name of the work queue to subscribe to.  Defaults to work.
 
 
 ### Command Line Interface
