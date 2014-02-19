@@ -16,7 +16,8 @@ module RabbitWQ
         work_exchange_type
         work_log_level
         work_log_path
-        work_queue
+        work_publish_queue
+        work_subscribe_queue
       )
     end
 
@@ -69,9 +70,14 @@ module RabbitWQ
       @work_log_path || '/var/log/rabbit-wq/rabbit-wq-work.log'
     end
 
-    def work_queue
-      @work_queue || 'work'
+    def work_publish_queue
+      @work_publish_queue || 'work'
+    end
+
+    def work_subscribe_queue
+      @work_subscribe_queue || 'work'
     end
 
   end
+
 end

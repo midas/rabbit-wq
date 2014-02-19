@@ -39,10 +39,10 @@ module RabbitWQ
                                        config.work_exchange, durable: true )
     end
 
-    def work_queue
-      @work_queue ||= channel.queue( config.work_queue,
-                                     durable: true ).
-                              bind( work_exchange )
+    def work_subscribe_queue
+      @work_subscribe_queue ||= channel.queue( config.work_subscribe_queue,
+                                               durable: true ).
+                                        bind( work_exchange )
     end
 
     def pool
@@ -54,7 +54,7 @@ module RabbitWQ
         Celluloid::Actor[:message_handler] = MessageHandler.new
       end
 
-      @work_consumer = work_queue.subscribe( manual_ack: true ) do |delivery_info, metadata, payload|
+      @work_consumer = work_subscribe_queue.subscribe( manual_ack: true ) do |delivery_info, metadata, payload|
         info "LISTENER RECEIVED #{payload}"
 
         if threads > 1

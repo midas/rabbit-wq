@@ -36,10 +36,10 @@ module RabbitWQ
         return
       end
 
-      with_work_exchange do |work_x, work_q|
-        work_x.publish( payload, durable: true,
-                                 content_type: YAML_MIMETYPE,
-                                 headers: options )
+      with_work_exchange do |work_x, work_pub_q, work_sub_q|
+        work_pub_q.publish( payload, durable: true,
+                                     content_type: YAML_MIMETYPE,
+                                     headers: options )
       end
     end
 
@@ -59,10 +59,11 @@ module RabbitWQ
                                    config.work_exchange,
                                    durable: true )
 
-          channel.queue( config.work_queue, durable: true ).tap do |q|
-            q.bind( exchange )
-            yield exchange, q
-          end
+          work_pub_q = channel.queue( config.work_publish_queue, durable: true )
+          work_sub_q = channel.queue( config.work_subscribe_queue, durable: true )
+          work_sub_q.bind( exchange )
+
+          yield exchange, work_pub_q, work_sub_q
         ensure
         end
       end
