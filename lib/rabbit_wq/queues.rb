@@ -15,15 +15,5 @@ module RabbitWQ
       end
     end
 
-    #def work_exchange
-      #@work_exchange ||= channel.direct( RabbitWQ.configuration.work_exchange, durable: true )
-    #end
-
-    #def work_queue
-      #@work_queue ||= channel.queue( RabbitWQ.configuration.work_queue,
-                                     #durable: true ).
-                              #bind( work_exchange )
-    #end
-
   end
 end
