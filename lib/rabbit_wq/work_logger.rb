@@ -11,6 +11,10 @@ module RabbitWQ
                 end
     end
 
+    def level=( level )
+      # conform to API but do not set log level this way
+    end
+
     %w(
       debug
       error
