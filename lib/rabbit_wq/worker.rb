@@ -33,5 +33,15 @@ module RabbitWQ
       info "END   #{self.class.name}"
     end
 
+    def enabled?
+      true
+    end
+
+    # When true, will place the worker in error queue
+    #
+    def error_on_disabled?
+      false
+    end
+
   end
 end

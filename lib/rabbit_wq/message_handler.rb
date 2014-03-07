@@ -20,7 +20,7 @@ module RabbitWQ
 
       worker = YAML::load( payload )
       info ANSI.yellow { "WORKER [#{worker.object_id}] " + worker.inspect }
-      worker.call
+      handle_work( worker, payload )
       try_on_success_callback( worker )
       channel.ack delivery_info.delivery_tag
     rescue => e
@@ -28,6 +28,18 @@ module RabbitWQ
     end
 
   protected
+
+    def handle_work( worker, payload )
+      unless worker.enabled?
+        if worker.error_on_disabled?
+          Work.enqueue_error_payload( payload, error: "Worker disabled" )
+        end
+        worker_info( worker, "Worker disabled" )
+        return
+      end
+
+      worker.call
+    end
 
     def handle_error( worker, e, channel, delivery_info, payload, metadata )
       headers = metadata[:headers]
