@@ -117,6 +117,30 @@ Called when an error is raised and either no retries were requested or are remai
 
 Called when an error is raised and a retry will be attempted.
 
+### Disabling a Worker
+
+A worker can be disabled by overriding the #enabled? method.
+
+    class SomeWorker
+      include RabbitWQ::Worker
+
+      def enabled?
+        # some logic to determine enabled
+      end
+    end
+
+By default, when a worker is disabled a log entry is created and the worker does no work and leaves hte work queue 
+system.  In order to have the worker sent to the error queue if disabled, simply override the #error_on_disabled? method:
+
+    class SomeWorker
+      include RabbitWQ::Worker
+
+      def error_on_disabled?
+        true
+      end
+    end
+
+
 ### Logging
 
 RabbitWQ provides a work logger that is available within all workers.  You must send a reference to self
