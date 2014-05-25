@@ -42,13 +42,13 @@ module RabbitWQ
     end
 
     def handle_error( worker, e, channel, delivery_info, payload, metadata )
-      headers = metadata[:headers]
+      headers = metadata[:headers] if metadata
 
       error_metadata = { type: e.class.name,
                          message: e.message,
                          backtrace: e.backtrace }
 
-      if headers['retry']
+      if headers && headers['retry']
         attempt = headers.fetch( 'attempt', 1 ).to_i
 
         if attempt < headers['retry']
