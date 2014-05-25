@@ -100,7 +100,7 @@ module RabbitWQ
     def load_environment
       unless environment_file_path &&
         File.exists?( environment_file_path )
-        return
+        raise "Environment file '#{environment_file_path}' does not exist"
       end
 
       ENV['RAILS_ENV'] = ENV['RACK_ENV'] = config.env
