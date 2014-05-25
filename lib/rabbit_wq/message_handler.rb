@@ -24,6 +24,7 @@ module RabbitWQ
       try_on_success_callback( worker )
       channel.ack delivery_info.delivery_tag
     rescue => e
+      error e
       handle_error( worker, e, channel, delivery_info, payload, metadata )
     end
 
