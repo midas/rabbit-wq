@@ -24,7 +24,6 @@ module RabbitWQ
       try_on_success_callback( worker )
       channel.ack delivery_info.delivery_tag
     rescue => e
-      error e
       handle_error( worker, e, channel, delivery_info, payload, metadata )
     end
 
@@ -49,7 +48,7 @@ module RabbitWQ
                          message: e.message,
                          backtrace: e.backtrace }
 
-      if headers && headers['retry']
+      if headers && headers['retry'] && !e.is_a?( RabbitWQ::FinalError )
         attempt = headers.fetch( 'attempt', 1 ).to_i
 
         if attempt < headers['retry']
@@ -61,6 +60,7 @@ module RabbitWQ
 
           Work.enqueue_payload( payload, headers.merge( delay: retry_delay, attempt: attempt + 1 ).
                                                  merge( error: error_metadata ))
+          error( e )
           worker_error( worker, "ERROR WITH RETRY " + error_metadata.inspect )
           try_on_error_callback( worker, e )
           try_on_retryable_error_callback( worker, e )
@@ -69,7 +69,16 @@ module RabbitWQ
         end
       end
 
+      if e.is_a?( RabbitWQ::FinalError ) && e.level != :error
+        RabbitWQ.work_logger.send( e.level, worker, e.message )
+        try_on_error_callback( worker, e )
+        try_on_final_error_callback( worker, e )
+        channel.nack delivery_info.delivery_tag
+        return
+      end
+
       Work.enqueue_error_payload( payload, error: error_metadata )
+      error( e )
       worker_error( worker, "FINAL ERROR " + error_metadata.inspect )
       try_on_error_callback( worker, e )
       try_on_final_error_callback( worker, e )

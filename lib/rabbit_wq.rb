@@ -10,6 +10,7 @@ module RabbitWQ
 
   autoload :Command,        'rabbit_wq/command'
   autoload :Configuration,  'rabbit_wq/configuration'
+  autoload :FinalError,     'rabbit_wq/final_error'
   autoload :Logging,        'rabbit_wq/logging'
   autoload :Queues,         'rabbit_wq/queues'
   autoload :MessageHandler, 'rabbit_wq/message_handler'

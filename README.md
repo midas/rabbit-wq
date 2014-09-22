@@ -68,6 +68,30 @@ Or install it yourself as:
 
     RabbitWQ::Work.enqueue( worker, retry: 1, retry_delay: 30000 )
 
+#### Skipping Retry by Forcing a Final Error
+
+You can use the RabbitWQ::FinalError to skip retry functionality in the case of an error that will never recover given a time delay.
+
+    class SomeWorker < Struct.new( :some_variable )
+      def call
+        final_error( "Some message" )
+      end
+    end
+
+The #final_error method will raise a RabbitWQ::FinalError which triggers the normal final error functionality (callbacks, logging, 
+error queue queueing).  If you owuld like to treat the final error as something other than an error level occurence, you can pass the level
+to #final_error.
+
+    class SomeWorker < Struct.new( :some_variable )
+      def call
+        final_error( "Some message", :info )
+      end
+    end
+
+When a level other than :error is provided, an log entry to the work log is created at the level provided, ie. :info.  However, an error is
+not logged and an error is not queued on the error queue.  The error callbacks are still executed.  If you want to avoid functionality in 
+an existing callback, you can test the #level of the error.
+
 ### Queueing Work with a Retry and Auto-Scaling Retry Dealy
 
     RabbitWQ::Work.enqueue( worker, retry: 1, retry_delay: 'auto-scale' )

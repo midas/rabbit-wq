@@ -37,6 +37,10 @@ module RabbitWQ
       true
     end
 
+    def final_error( msg, level=:error )
+      raise RabbitWQ::FinalError.new( level ), msg
+    end
+
     # When true, will place the worker in error queue
     #
     def error_on_disabled?
