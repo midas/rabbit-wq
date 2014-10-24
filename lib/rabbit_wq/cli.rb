@@ -120,7 +120,8 @@ options:
     end
 
     def status
-      RabbitWQ::ServerDaemon.new( options ).status
+      result = RabbitWQ::ServerDaemon.new( options ).status
+      at_exit { exit result }
     end
 
   end
