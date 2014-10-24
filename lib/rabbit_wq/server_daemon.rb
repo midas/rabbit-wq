@@ -46,13 +46,14 @@ module RabbitWQ
     end
 
     def status
-      out = "#{APP_NAME} "
+      $stdout.print "#{APP_NAME} "
       if process_exists?
-        out << "process running with PID: #{pid}"
+        $stdout.puts "process running with PID: #{pid}"
+        true
       else
-        out << "process does not exist"
+        $stdout.puts "process does not exist"
+        false
       end
-      $stdout.puts out
     end
 
    protected
