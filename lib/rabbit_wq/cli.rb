@@ -63,10 +63,12 @@ options:
         when "status"
           Trollop::options do
             opt :pid, "The path for the PID file", :type => String, :default => DEFAULT_PID_PATH
+            opt :quiet, "Do not prompt to remove an old PID file", :type => :boolean, :default => false, :short => '-q'
           end
         when "stop"
           Trollop::options do
             opt :pid, "The path for the PID file", :type => String, :default => DEFAULT_PID_PATH
+            opt :quiet, "Do not prompt to remove an old PID file", :type => :boolean, :default => false, :short => '-q'
           end
         else
           Trollop::die "unknown command #{cmd.inspect}"
