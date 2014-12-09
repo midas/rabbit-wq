@@ -87,7 +87,11 @@ module RabbitWQ
     end
 
     def kill_process
-      abort "#{APP_NAME} process is not running" unless process_exists?
+      unless process_exists?
+        $stdout.write "#{APP_NAME} process is not running"
+        return
+      end
+
       $stdout.write "Attempting to stop #{APP_NAME} process #{pid}..."
       Process.kill INT, pid
       iteration_num = 0
