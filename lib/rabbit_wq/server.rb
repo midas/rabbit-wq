@@ -95,10 +95,6 @@ module RabbitWQ
       require environment_file_path
     end
 
-    #def config
-      #RabbitWQ.configuration
-    #end
-
     def environment_file_path
       config.environment_file_path
     end

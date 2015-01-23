@@ -8,11 +8,12 @@ module RabbitWQ
     include Celluloid
     include Queues
     include Servitude::Logging
+    include WorkLogging
 
     REQUEUE = true
 
     def call( options )
-      Time.zone = RabbitWQ.configuration.time_zone
+      Time.zone = Servitude.configuration.time_zone
 
       channel       = options[:channel]
       delivery_info = options[:delivery_info]

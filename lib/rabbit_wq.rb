@@ -16,6 +16,7 @@ module RabbitWQ
   autoload :Work,           'rabbit_wq/work'
   autoload :Worker,         'rabbit_wq/worker'
   autoload :WorkLogger,     'rabbit_wq/work_logger'
+  autoload :WorkLogging,    'rabbit_wq/work_logging'
 
   def self.perform_boot
     author = 'C. Jason Harrelson'
