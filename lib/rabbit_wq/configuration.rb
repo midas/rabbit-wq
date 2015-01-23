@@ -1,83 +1,27 @@
-require 'oj'
+require 'servitude'
 
 module RabbitWQ
-  class Configuration
+  class Configuration < Servitude::Configuration
 
-    def self.attributes
-      %w(
-        delayed_exchange_prefix
-        delayed_queue_prefix
-        environment_file_path
-        env
-        error_queue
-        threads
-        time_zone
-        work_exchange
-        work_exchange_type
-        work_log_level
-        work_log_path
-        work_publish_queue
-        work_subscribe_queue
-      )
-    end
-
-    attr_accessor( *attributes )
-
-    def self.from_file( file_path )
-      options = Oj.load( File.read( file_path ))
-      RabbitWQ.configuration = Configuration.new
-
-      attributes.each do |c|
-        if options[c]
-          RabbitWQ.configuration.send( :"#{c}=", options[c] )
-        end
-      end
-    end
-
-    def delayed_exchange_prefix
-      @delayed_exchange_prefix || 'work-delay'
-    end
-
-    def delayed_queue_prefix
-      @delayed_queue_prefix || 'work-delay'
-    end
-
-    def env
-      @env || 'production'
-    end
-
-    def error_queue
-      @error_queue || 'work-error'
-    end
-
-    def time_zone
-      @time_zone || 'UTC'
-    end
-
-    def work_exchange
-      @work_exchange || 'work'
-    end
-
-    def work_exchange_type
-      @work_exchange_type || 'fanout'
-    end
-
-    def work_log_level
-      @work_log_level || 'info'
-    end
-
-    def work_log_path
-      @work_log_path || '/var/log/rabbit-wq/rabbit-wq-work.log'
-    end
-
-    def work_publish_queue
-      @work_publish_queue || 'work'
-    end
-
-    def work_subscribe_queue
-      @work_subscribe_queue || 'work'
+    def self.defaults
+      {
+        delayed_exchange_prefix: 'work-delay',
+        delayed_queue_prefix: 'work-delay',
+        env: 'production',
+        error_queue: 'work-error',
+        log: "/var/log/rabbit-wq/#{RabbitWQ.process_name}.log",
+        log_level: 'info',
+        pid: "/var/run/rabbit-wq/#{RabbitWQ.process_name}.pid",
+        threads: 1,
+        time_zone: 'UTC',
+        work_exchange: 'work',
+        work_exchange_type: 'fanout',
+        work_log_level: 'info',
+        work_log_path: '/var/log/rabbit-wq/rabbit-wq-work.log',
+        work_publish_queue: 'work',
+        work_subscribe_queue: 'work'
+      }
     end
 
   end
-
 end

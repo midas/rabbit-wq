@@ -1,7 +1,7 @@
 require 'yell'
 
 module RabbitWQ
-  module Logging
+  module WorkLogging
 
     %w(
       debug
@@ -10,13 +10,6 @@ module RabbitWQ
       info
       warn
     ).each do |level|
-
-      define_method level do |*messages|
-        return unless RabbitWQ.logger
-        messages.each do |message|
-          RabbitWQ.logger.send level, message
-        end
-      end
 
       define_method "worker_#{level}" do |worker, *messages|
         return unless RabbitWQ.work_logger
