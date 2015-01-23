@@ -7,6 +7,7 @@ module RabbitWQ
   include Servitude::Base
 
   autoload :Command,        'rabbit_wq/command'
+  autoload :Cli,            'rabbit_wq/cli'
   autoload :Configuration,  'rabbit_wq/configuration'
   autoload :FinalError,     'rabbit_wq/final_error'
   autoload :Queues,         'rabbit_wq/queues'
