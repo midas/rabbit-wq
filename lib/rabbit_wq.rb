@@ -38,8 +38,8 @@ module RabbitWQ
 
   class << self
     attr_accessor :work_logger
-    #attr_accessor :logger,
-                  #:work_logger
   end
+
+  perform_boot
 
 end

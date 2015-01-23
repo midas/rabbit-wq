@@ -1,5 +1,4 @@
 require 'bunny'
-require 'celluloid/autostart'
 
 module RabbitWQ
   class Server

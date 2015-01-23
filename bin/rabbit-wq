@@ -1,5 +1,3 @@
 #!/usr/bin/env ruby
 require 'rabbit_wq'
-
-RabbitWQ.perform_boot
 RabbitWQ::Cli.start

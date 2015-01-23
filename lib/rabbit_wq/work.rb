@@ -5,6 +5,10 @@ module RabbitWQ
 
     YAML_MIMETYPE = 'application/yaml'
 
+    def self.config
+      Servitude.configuration ||= RabbitWQ::Configuration.load
+    end
+
     def self.enqueue( worker, options={} )
       payload = worker.to_yaml
       enqueue_payload( payload, options )
@@ -80,10 +84,6 @@ module RabbitWQ
           b.stop
         end
       end
-    end
-
-    def self.config
-      RabbitWQ.configuration
     end
 
   end
