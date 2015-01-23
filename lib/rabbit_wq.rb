@@ -20,7 +20,7 @@ module RabbitWQ
   def self.perform_boot
     author = 'C. Jason Harrelson'
 
-    years = 2014
+    years = 2013
     years = "#{years}–#{::Time.now.year}" if years < ::Time.now.year
 
     boot host_namespace:      self,

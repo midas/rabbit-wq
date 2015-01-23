@@ -12,6 +12,7 @@ module RabbitWQ
         log: "/var/log/rabbit-wq/#{RabbitWQ.process_name}.log",
         log_level: 'info',
         pid: "/var/run/rabbit-wq/#{RabbitWQ.process_name}.pid",
+        threads: 1,
         time_zone: 'UTC',
         work_exchange: 'work',
         work_exchange_type: 'fanout',

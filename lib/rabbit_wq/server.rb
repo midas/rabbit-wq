@@ -4,34 +4,40 @@ require 'celluloid/autostart'
 module RabbitWQ
   class Server
 
-    include Logging
+    include Servitude::Server
+    include Servitude::ServerThreaded
     include Queues
-    include ServerLogging
 
-    attr_reader :options,
-                :work_consumer,
+    after_initialize :initialize_work_logger
+    after_initialize :load_environment
+
+    attr_reader :work_consumer,
                 :work_exchange
 
-    def initialize( options )
-      @options = options
+    finalize do
+      info 'Shutting down ...'
 
-      configure_server
-    end
-
-    def start
-      log_startup
-      run
-
-      trap( INT ) { finalize; exit }
-      sleep
+      work_consumer.cancel
+      mq.close
     end
 
   protected
 
-    def finalize
-      info "SHUTTING DOWN"
-      work_consumer.cancel
-      mq.close
+    def handler_class
+      RabbitWQ::MessageHandler
+    end
+
+    def run
+      @work_consumer = work_subscribe_queue.subscribe( manual_ack: true ) do |delivery_info, metadata, payload|
+        with_supervision( delivery_info: delivery_info ) do
+          debug( "#{Rainbow(  "LISTENER RECEIVED " ).magenta} #{payload}" )
+
+          call_handler_respecting_thread_count( payload: payload,
+                                                delivery_info: delivery_info,
+                                                metadata: metadata,
+                                                channel: channel )
+        end
+      end
     end
 
     def work_exchange
@@ -45,56 +51,38 @@ module RabbitWQ
                                         bind( work_exchange )
     end
 
-    def pool
-      @pool ||= MessageHandler.pool( size: threads )
+    def error_queue
+      channel.queue( config.error_queue, durable: true )
     end
 
-    def run
-      if threads == 1
-        Celluloid::Actor[:message_handler] = MessageHandler.new
-      end
-
-      @work_consumer = work_subscribe_queue.subscribe( manual_ack: true ) do |delivery_info, metadata, payload|
-        info "LISTENER RECEIVED #{payload}"
-
-        if threads > 1
-          pool.async.call( payload: payload,
-                           delivery_info: delivery_info,
-                           metadata: metadata,
-                           channel: channel )
-        else
-          message_handler.call( payload: payload,
-                                delivery_info: delivery_info,
-                                metadata: metadata,
-                                channel: channel )
-        end
-      end
+    def warn_for_supevision_error
+      warn( Rainbow(  "RETRYING due to waiting on supervisor to restart actor ..." ).cyan )
     end
 
-    def message_handler
-      Celluloid::Actor[:message_handler]
+    def warn_for_dead_actor_error
+      warn( Rainbow(  "RETRYING due to Celluloid::DeadActorError ..." ).blue )
     end
 
-    def threads
-      config.threads
+    def log_error( e )
+      parts = [Rainbow(  [e.class.name, e.message].join( ': ' ) ).red, format_backtrace( e.backtrace )]
+      error( parts.join( "\n" ))
     end
 
-    def config
-      RabbitWQ.configuration
+    def handle_error( options, e )
+      delivery_info = options[:delivery_info]
+      log_error( e )
+      #error_queue.publish( payload, headers: { exception_message: e.message,
+                                               #exception_class: e.class.name,
+                                               #exception_backtrace: e.backtrace } )
+      debug( Rainbow(  "NACK" ).red + " #{e.message}" )
+      channel.nack( delivery_info.delivery_tag )
+    rescue => ex
+      error( Rainbow(  "ERROR while handling error | #{ex.class.name} | #{ex.message} | #{ex.backtrace.inspect}" ).red )
     end
 
-    def configure_server
-      load_configuration
-      initialize_loggers
-      load_environment
-      resolve_threads
-    end
-
-    def load_configuration
-      if File.exists?( options[:config] )
-        options[:config_loaded] = true
-        Configuration.from_file( options[:config] )
-      end
+    def initialize_work_logger
+      RabbitWQ.work_logger = WorkLogger.new( config.work_log_level,
+                                             config.work_log_path )
     end
 
     def load_environment
@@ -107,18 +95,12 @@ module RabbitWQ
       require environment_file_path
     end
 
-    def resolve_threads
-      if options[:threads]
-        RabbitWQ.configuration.threads = options[:threads]
-      end
-
-      return if RabbitWQ.configuration.threads
-
-      RabbitWQ.configuration.threads = 1
-    end
+    #def config
+      #RabbitWQ.configuration
+    #end
 
     def environment_file_path
-      RabbitWQ.configuration.environment_file_path
+      config.environment_file_path
     end
 
   end
