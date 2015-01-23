@@ -32,7 +32,7 @@ module RabbitWQ
         end
 
         if worker
-          logger.send( level, "[" + ANSI.cyan { "#{worker.class.name}:#{worker.object_id}" } + "] #{message}" )
+          logger.send( level, "[" + Rainbow( "#{worker.class.name}:#{worker.object_id}" ).cyan + "] #{message}" )
         else
           logger.send( level, message )
         end

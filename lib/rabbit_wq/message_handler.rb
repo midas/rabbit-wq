@@ -1,12 +1,13 @@
 require 'celluloid/autostart'
+require 'servitude'
 require 'yaml'
 
 module RabbitWQ
   class MessageHandler
 
     include Celluloid
-    include Logging
     include Queues
+    include Servitude::Logging
 
     REQUEUE = true
 
@@ -19,7 +20,7 @@ module RabbitWQ
       payload       = options[:payload]
 
       worker = YAML::load( payload )
-      info ANSI.yellow { "WORKER [#{worker.object_id}] " + worker.inspect }
+      info Rainbow( "WORKER [#{worker.object_id}] " + worker.inspect ).yellow
       handle_work( worker, payload )
       try_on_success_callback( worker )
       channel.ack delivery_info.delivery_tag
@@ -106,7 +107,7 @@ module RabbitWQ
     end
 
     def requeue( channel, delivery_info, e=nil )
-      info ANSI.yellow { 'REQUEUE ' + e.message }
+      info Rainbow( 'REQUEUE ' + e.message ).yellow
       channel.reject delivery_info.delivery_tag, REQUEUE
     end
 
