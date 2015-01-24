@@ -20,7 +20,7 @@ module RabbitWQ
       metadata      = options[:metadata]
       payload       = options[:payload]
 
-      worker = YAML::load( payload )
+      worker = deserialize_worker( payload )
       info Rainbow( "WORKER [#{worker.object_id}] " + worker.inspect ).yellow
       handle_work( worker, payload )
       try_on_success_callback( worker )
@@ -30,6 +30,18 @@ module RabbitWQ
     end
 
   protected
+
+    def deserialize_worker( payload )
+      YAML::load( payload ).tap do |worker|
+        unless worker.is_a?( RabbitWQ::Worker )
+          raise ArgumentError, "Worker of type #{worker.class.name} is not a valid worker (not a descendent of #{RabbitWQ::Worker.name})"
+        end
+      end
+    rescue => e
+      raise RabbitWQ::InvalidWorkError,
+            "#{e.message} -- #{e.class.name}",
+            e.backtrace
+    end
 
     def handle_work( worker, payload )
       unless worker.enabled?
