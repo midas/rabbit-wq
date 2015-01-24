@@ -29,7 +29,7 @@ module RabbitWQ
     def run
       @work_consumer = work_subscribe_queue.subscribe( manual_ack: true ) do |delivery_info, metadata, payload|
         with_supervision( delivery_info: delivery_info ) do
-          debug( "#{Rainbow(  "LISTENER RECEIVED " ).magenta} #{payload}" )
+          debug( "#{Rainbow( "LISTENER RECEIVED " ).magenta} #{payload}" )
 
           call_handler_respecting_thread_count( payload: payload,
                                                 delivery_info: delivery_info,
@@ -55,15 +55,15 @@ module RabbitWQ
     end
 
     def warn_for_supevision_error
-      warn( Rainbow(  "RETRYING due to waiting on supervisor to restart actor ..." ).cyan )
+      warn( Rainbow( "RETRYING due to waiting on supervisor to restart actor ..." ).cyan )
     end
 
     def warn_for_dead_actor_error
-      warn( Rainbow(  "RETRYING due to Celluloid::DeadActorError ..." ).blue )
+      warn( Rainbow( "RETRYING due to Celluloid::DeadActorError ..." ).blue )
     end
 
     def log_error( e )
-      parts = [Rainbow(  [e.class.name, e.message].join( ': ' ) ).red, format_backtrace( e.backtrace )]
+      parts = [Rainbow( [e.class.name, e.message].join( ': ' ) ).red, format_backtrace( e.backtrace )]
       error( parts.join( "\n" ))
     end
 
@@ -73,10 +73,10 @@ module RabbitWQ
       #error_queue.publish( payload, headers: { exception_message: e.message,
                                                #exception_class: e.class.name,
                                                #exception_backtrace: e.backtrace } )
-      debug( Rainbow(  "NACK" ).red + " #{e.message}" )
+      debug( Rainbow( "NACK" ).red + " #{e.message}" )
       channel.nack( delivery_info.delivery_tag )
     rescue => ex
-      error( Rainbow(  "ERROR while handling error | #{ex.class.name} | #{ex.message} | #{ex.backtrace.inspect}" ).red )
+      error( Rainbow( "ERROR while handling error | #{ex.class.name} | #{ex.message} | #{ex.backtrace.inspect}" ).red )
     end
 
     def initialize_work_logger
