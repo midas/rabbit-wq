@@ -1,0 +1,23 @@
+{
+  "delayed_exchange_prefix": "work-delay",
+  "delayed_queue_prefix": "work-delay",
+  "environment_file_path": "/some/path/to/environment/file"",
+  "env": "development",
+  "error_queue": "error",
+  "threads": 1,
+  "time_zone": "UTC",
+  "work_exchange": "work",
+  "work_exchange_type": "fanout",
+  "work_log_level": "debug",
+  "work_log_path": "/var/log/ncite/work.log",
+  "work_publish_queue": "work",
+  "work_subscribe_queue": "work-repo",
+  "ignored_workers": {
+    "to_error_queue": [
+      "Some::Worker"
+    ],
+    "trash": [
+      "Some::OtherWorker"
+    ]
+  }
+}
