@@ -44,11 +44,22 @@ module RabbitWQ
     end
 
     def handle_work( worker, payload )
+      if ignore_and_trash?( worker )
+        worker_info( worker, "Worker trashed" )
+        return
+      end
+
+      if ignore_and_error?( worker )
+        worker_info( worker, "Worker ignored and error queued" )
+        Work.enqueue_error_payload( payload, error: "Worker ignored" )
+        return
+      end
+
       unless worker.enabled?
+        worker_info( worker, "Worker disabled" )
         if worker.error_on_disabled?
           Work.enqueue_error_payload( payload, error: "Worker disabled" )
         end
-        worker_info( worker, "Worker disabled" )
         return
       end
 
@@ -122,6 +133,18 @@ module RabbitWQ
     def requeue( channel, delivery_info, e=nil )
       info Rainbow( 'REQUEUE ' + e.message ).yellow
       channel.reject delivery_info.delivery_tag, REQUEUE
+    end
+
+    def ignore_and_trash?( worker )
+      config.ignored_workers_trash.include?( worker.class.name )
+    end
+
+    def ignore_and_error?( worker )
+      config.ignored_workers_to_error_queue.include?( worker.class.name )
+    end
+
+    def config
+      Servitude.configuration
     end
 
     def retry_delays( retry_num )

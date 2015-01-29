@@ -24,5 +24,15 @@ module RabbitWQ
       }
     end
 
+    def ignored_workers_to_error_queue
+      return [] unless ignored_workers
+      Array( ignored_workers.to_error_queue )
+    end
+
+    def ignored_workers_trash
+      return [] unless ignored_workers
+      Array( ignored_workers.trash )
+    end
+
   end
 end

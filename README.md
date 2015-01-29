@@ -213,6 +213,14 @@ Here is an example configuration file with each option's default value:
       "work_log_path": "/var/log/rabbit-wq/rabbit-wq-work.log",
       "work_publish_queue": "work"
       "work_subscribe_queue": "work"
+      "ignored_workers": {
+        "to_error_queue": [
+          "Some::Worker"
+        ],
+        "trash": [
+          "Some::OtherWorker"
+        ]
+      }
     }
 
 #### Options
@@ -231,6 +239,12 @@ The environment to run in.  Defaults to production.
 
 #####error_queue
 The name of the error queue. Defaults to error.
+
+#####ignored_workers/to_error_queue
+List of workers to ignore.  Will add directly to error_queue without obeying retires, etc.
+
+#####ignored_workers/trash
+List of workers to ignore.  Trashes the worker without error or complaining.
 
 #####threads
 The size of the thread pool.  Can be overridden with the command line option --threads or -t.  Defaults to 1.
