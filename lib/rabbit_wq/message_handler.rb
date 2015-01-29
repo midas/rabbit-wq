@@ -45,12 +45,12 @@ module RabbitWQ
 
     def handle_work( worker, payload )
       if ignore_and_trash?( worker )
-        worker_info( worker, "Worker trashed" )
+        info "Trashed: #{worker.class.name}:#{worker.object_id}"
         return
       end
 
       if ignore_and_error?( worker )
-        worker_info( worker, "Worker ignored and error queued" )
+        info "Ignored and sent to error queue: #{worker.class.name}:#{worker.object_id}"
         Work.enqueue_error_payload( payload, error: "Worker ignored" )
         return
       end
