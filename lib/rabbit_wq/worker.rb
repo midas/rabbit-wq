@@ -12,7 +12,8 @@ module RabbitWQ
         ).each do |level|
 
           define_method level do |*messages|
-            return unless RabbitWQ.logger
+            return unless RabbitWQ.work_logger
+
             messages.each do |message|
               RabbitWQ.work_logger.send level, self, message
             end
