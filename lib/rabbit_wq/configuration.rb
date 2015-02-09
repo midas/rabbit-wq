@@ -12,6 +12,7 @@ module RabbitWQ
         log: "/var/log/rabbit-wq/#{RabbitWQ.process_name}.log",
         log_level: 'info',
         pid: "/var/run/rabbit-wq/#{RabbitWQ.process_name}.pid",
+        prefetch: 50,
         supervision_retry_timeout_in_seconds: 1,
         threads: 1,
         time_zone: 'UTC',

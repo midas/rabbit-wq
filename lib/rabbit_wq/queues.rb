@@ -11,7 +11,7 @@ module RabbitWQ
 
     def channel
       @channel ||= mq.create_channel.tap do |c|
-        c.prefetch( 10 )
+        c.prefetch( config.prefetch )
       end
     end
 
