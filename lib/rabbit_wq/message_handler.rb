@@ -111,23 +111,23 @@ module RabbitWQ
     end
 
     def try_on_success_callback( worker )
-      return unless worker.respond_to?( :on_success )
-      worker.on_success
+      return unless worker.respond_to?( :on_success, true )
+      worker.send( :on_success )
     end
 
     def try_on_error_callback( worker, e )
-      return unless worker.respond_to?( :on_error )
-      worker.on_error( e )
+      return unless worker.respond_to?( :on_error, true )
+      worker.send( :on_error, e )
     end
 
     def try_on_retryable_error_callback( worker, e )
-      return unless worker.respond_to?( :on_retryable_error )
-      worker.on_retryable_error( e )
+      return unless worker.respond_to?( :on_retryable_error, true )
+      worker.send( :on_retryable_error, e )
     end
 
     def try_on_final_error_callback( worker, e )
-      return unless worker.respond_to?( :on_final_error )
-      worker.on_final_error( e )
+      return unless worker.respond_to?( :on_final_error, true )
+      worker.send( :on_final_error, e )
     end
 
     def requeue( channel, delivery_info, e=nil )
