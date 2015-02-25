@@ -25,8 +25,7 @@ module RabbitWQ
     years = 2013
     years = "#{years}–#{::Time.now.year}" if years < ::Time.now.year
 
-    boot host_namespace:      self,
-         app_name:            'Rabbit WQ',
+    boot app_name:            'Rabbit WQ',
          author:              author,
          attribution:         "v#{VERSION} Copyright © #{years} #{author}",
          default_config_path: "/etc/rabbit-wq/#{process_name}.conf",

@@ -6,7 +6,7 @@ module RabbitWQ
     YAML_MIMETYPE = 'application/yaml'
 
     def self.config
-      Servitude.configuration ||= RabbitWQ::Configuration.load
+      RabbitWQ.configuration ||= RabbitWQ::Configuration.load( RabbitWQ::DEFAULT_CONFIG_PATH )
     end
 
     def self.enqueue( worker, options={} )

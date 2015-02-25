@@ -7,13 +7,14 @@ module RabbitWQ
 
     include Celluloid
     include Queues
-    include Servitude::Logging
+    include ::Servitude::ConfigHelper
+    include ::Servitude::Logging
     include WorkLogging
 
     REQUEUE = true
 
     def call( options )
-      Time.zone = Servitude.configuration.time_zone
+      Time.zone = config.time_zone
 
       channel       = options[:channel]
       delivery_info = options[:delivery_info]
@@ -143,8 +144,8 @@ module RabbitWQ
       config.ignored_workers_to_error_queue.include?( worker.class.name )
     end
 
-    def config
-      Servitude.configuration
+    def host_namespace
+      RabbitWQ
     end
 
     def retry_delays( retry_num )

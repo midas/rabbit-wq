@@ -26,6 +26,10 @@ module RabbitWQ
       RabbitWQ::MessageHandler
     end
 
+    def host_namespace
+      RabbitWQ
+    end
+
     def run
       @work_consumer = work_subscribe_queue.subscribe( manual_ack: true ) do |delivery_info, metadata, payload|
         with_supervision( delivery_info: delivery_info ) do

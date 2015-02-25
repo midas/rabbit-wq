@@ -9,6 +9,10 @@ module RabbitWQ
         RabbitWQ::Configuration
       end
 
+      def host_namespace
+        RabbitWQ
+      end
+
     end
 
   end
