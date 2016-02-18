@@ -195,7 +195,7 @@ to publish to a local queue that is shoveled to a central work queue, where the 
 
 ### Configuration File
 
-The RabbitWQ configuration file uses JSON syntax.  The default location for the configuration file is /var/run/rabbit-wq/rabbit-wq.conf
+The RabbitWQ configuration file uses JSON syntax.  The default location for the configuration file is /etc/rabbit-wq/rabbit-wq.conf
 
 Here is an example configuration file with each option's default value:
 
