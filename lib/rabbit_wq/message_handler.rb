@@ -1,3 +1,4 @@
+require 'active_support/core_ext'
 require 'celluloid/autostart'
 require 'servitude'
 require 'yaml'

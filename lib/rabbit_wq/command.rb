@@ -1,3 +1,6 @@
+require 'optparse'
+require 'rails'
+
 module RabbitWQ
   class Command
 
