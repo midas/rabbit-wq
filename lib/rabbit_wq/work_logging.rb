@@ -1,5 +1,3 @@
-require 'yell'
-
 module RabbitWQ
   module WorkLogging
 
